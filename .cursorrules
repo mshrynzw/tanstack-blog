@@ -1,3 +1,7 @@
+# Language
+- Always respond in Japanese.
+- Use Japanese for explanations, comments, and commit messages unless the user explicitly asks for English.
+
 # TanStack Start ブログアプリ学習プラン
 
 このプロジェクトは、TanStack Startでブログアプリを作成しながら学習するためのものです。

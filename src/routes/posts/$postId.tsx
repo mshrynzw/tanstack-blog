@@ -1,9 +1,17 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, notFound } from '@tanstack/react-router'
 import { getDb } from '@/db'
 import { posts } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 
 export const Route = createFileRoute('/posts/$postId')({
+  // "new"はこのルートでは処理しない（/posts/newが優先される）
+  // beforeLoadでチェックする前に、ルーターが既にマッチさせてしまうため、
+  // ここではloaderでチェックする
+  beforeLoad: ({ params }) => {
+    if (params.postId === 'new') {
+      throw notFound()
+    }
+  },
   loader: async ({ params }) => {
     const postIdNum = parseInt(params.postId, 10)
     
@@ -12,7 +20,6 @@ export const Route = createFileRoute('/posts/$postId')({
     }
 
     try {
-      // データベース接続を取得
       const db = getDb()
       
       const post = await db.query.posts.findFirst({

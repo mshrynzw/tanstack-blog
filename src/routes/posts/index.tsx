@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { getDb } from '@/db'
 import { desc } from 'drizzle-orm'
@@ -18,7 +18,7 @@ const getPosts = createServerFn({
   }
 })
 
-export const Route = createFileRoute('/posts')({
+export const Route = createFileRoute('/posts/')({
   loader: async () => {
     try {
       return await getPosts()
@@ -37,9 +37,17 @@ function PostsList() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 py-12 px-6">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Blog Posts List</h1>
-          <p className="text-gray-400">Blog app built with TanStack Start</p>
+      <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold text-white mb-2">Blog Posts List</h1>
+            <p className="text-gray-400">Blog app built with TanStack Start</p>
+          </div>
+          <Link
+            to="/posts/new"
+            className="px-6 py-3 bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-lg transition-colors"
+          >
+            Create New Post
+          </Link>
         </div>
 
         {postsData.length === 0 ? (

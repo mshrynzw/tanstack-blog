@@ -30,8 +30,30 @@ export const Route = createRootRoute({
     ],
   }),
 
+  notFoundComponent: NotFoundComponent,
   shellComponent: RootDocument,
 })
+
+function NotFoundComponent() {
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 py-12 px-6">
+      <div className="max-w-4xl mx-auto text-center">
+        <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-8">
+          <h1 className="text-4xl font-bold text-white mb-4">404 - Page not found</h1>
+          <p className="text-gray-400 mb-6">
+            The page you are looking for does not exist or has been moved.
+          </p>
+          <a
+            href="/posts"
+            className="inline-block px-6 py-3 bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-lg transition-colors"
+          >
+            Back to posts
+          </a>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
