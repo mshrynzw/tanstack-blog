@@ -1,0 +1,152 @@
+# TanStack Start ブログアプリ学習プラン
+
+このプロジェクトは、TanStack Startでブログアプリを作成しながら学習するためのものです。
+以下の推奨学習順序に従って、段階的に機能を実装していきます。
+
+## 推奨学習順序
+
+### レッスン1-2: 基本構造とデータベーススキーマ
+**目標**: ファイルベースルーティングとデータベース設計を理解する
+
+- ルーティング構造の作成
+  - `/posts` - 記事一覧ページ
+  - `/posts/$postId` - 記事詳細ページ
+  - `/posts/new` - 新規記事作成ページ
+- データベーススキーマの設計
+  - `posts`テーブルの作成（タイトル、本文、著者情報、作成日時、更新日時）
+  - `pnpm db:push`でスキーマを適用
+
+**学習内容**: `createFileRoute`、動的ルート（`$postId`）、Drizzle ORMのスキーマ定義
+
+---
+
+### レッスン3: Server Functions基礎
+**目標**: `createServerFn`でデータ取得を実装
+
+- 記事一覧を取得するServer Function（GETメソッド）
+- データベースクエリの実行
+
+**学習内容**: `createServerFn`の基本、データベースクエリ、型安全性
+
+---
+
+### レッスン4: LoadersとSSR
+**目標**: ルートローダーでデータを事前取得
+
+- `loader`関数の実装
+- `useLoaderData`でデータ取得
+
+**学習内容**: `loader`の使い方、`useLoaderData`フック、SSRの動作原理
+
+---
+
+### レッスン5: 動的ルートと詳細ページ
+**目標**: 個別記事ページの実装
+
+- `/posts/$postId`で記事詳細を表示
+- 動的ルートパラメータの取得
+
+**学習内容**: 動的ルートパラメータ（`useParams`）、個別データ取得、エラーハンドリング
+
+---
+
+### レッスン6: フォームとServer Functions（POST）+ Zod導入
+**目標**: 記事作成機能とバリデーション
+
+- 新規記事作成フォームの実装
+- POST Server Functionの実装
+- **Zodによるバリデーション**（このレッスンからZodを導入）
+  - バリデーションスキーマの定義（`src/lib/validations.ts`に推奨）
+  - `inputValidator`での検証
+
+**学習内容**: `inputValidator`でのバリデーション、POST Server Function、フォーム送信とリダイレクト、Zodスキーマの定義
+
+---
+
+### レッスン7: 認証統合
+**目標**: WorkOSと連携して認証機能を追加
+
+- 記事作成を認証ユーザーのみに制限
+- 著者情報の保存
+
+**学習内容**: `useAuth`フック（WorkOS）、認証状態の確認、保護されたルート、ユーザー情報の取得
+
+---
+
+### レッスン8: 編集・削除機能
+**目標**: CRUD操作の完成
+
+- 記事編集・削除機能
+- PUT/DELETE Server Functions
+- オプティミスティック更新
+
+**学習内容**: PUT/DELETE Server Functions、`router.invalidate()`での再取得、オプティミスティック更新、権限チェック
+
+---
+
+### レッスン9: 検索とフィルタリング
+**目標**: 高度なデータ操作
+
+- 記事検索機能
+- クエリパラメータの扱い
+- データベース検索
+
+**学習内容**: クエリパラメータ（`useSearch`）、データベース検索（LIKE、全文検索）、クライアント側フィルタリング
+
+---
+
+### レッスン10: ストリーミングと最適化
+**目標**: パフォーマンス最適化
+
+- ストリーミングSSR
+- プログレッシブレンダリング
+- コード分割
+
+**学習内容**: ストリーミングSSR、コード分割、キャッシング戦略、パフォーマンス最適化
+
+---
+
+## 重要なポイント
+
+1. **学習の進め方**
+   - レッスン1-2から順番に実装
+   - 各レッスンで1つの機能を学ぶ
+   - 既存のデモコード（`src/routes/demo/`）を参考にする
+   - 特に`drizzle.tsx`、`prisma.tsx`、`start.server-funcs.tsx`が役立つ
+
+2. **データベース操作**
+   - Drizzle ORMを使用（`src/db/index.ts`）
+   - スキーマ変更後は`pnpm db:push`で適用
+   - スキーマ定義は`src/db/schema.ts`
+
+3. **Zodの使用**
+   - **レッスン6以降でZodを導入**してバリデーションを強化
+   - `src/lib/validations.ts`にスキーマを定義することを推奨
+   - レッスン1-5ではシンプルな型アサーションでOK
+
+4. **認証**
+   - WorkOSを使用（既に設定済み）
+   - `useAuth`フックで認証状態を取得
+   - レッスン7で認証機能を統合
+
+5. **参考リソース**
+   - [TanStack Start ドキュメント](https://tanstack.com/start)
+   - [TanStack Router ドキュメント](https://tanstack.com/router)
+   - [Drizzle ORM ドキュメント](https://orm.drizzle.team/)
+   - [Zod ドキュメント](https://zod.dev/)
+
+## コードスタイル
+
+- TypeScriptを使用
+- Tailwind CSSでスタイリング
+- Biomeでフォーマットとリント
+- ファイルベースルーティング（`src/routes/`）
+
+## 現在のプロジェクト構成
+
+- データベース: Drizzle ORM + Neon PostgreSQL
+- 認証: WorkOS AuthKit
+- ルーティング: TanStack Router（ファイルベース）
+- フレームワーク: TanStack Start
+- バリデーション: Zod（レッスン6以降）
+
