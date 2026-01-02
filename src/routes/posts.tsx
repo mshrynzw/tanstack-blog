@@ -1,15 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
-import { db } from '@/db'
-import {desc} from 'drizzle-orm'
+import { getDb } from '@/db'
+import { desc } from 'drizzle-orm'
 import { posts } from '@/db/schema'
 
 const getPosts = createServerFn({
-    method: 'GET',
+  method: 'GET',
 }).handler(async () => {
   try {
+    const db = getDb()
     return await db.query.posts.findMany({
-        orderBy: [desc(posts.createdAt)],
+      orderBy: [desc(posts.createdAt)],
     })
   } catch (error) {
     console.error('Error fetching posts:', error)
@@ -32,24 +33,24 @@ export const Route = createFileRoute('/posts')({
 
 function PostsList() {
   const postsData = Route.useLoaderData()
-    return (
-        <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 py-12 px-6">
-            <div className="max-w-7xl mx-auto">
-                <div className="mb-8">
-                    <h1 className="text-4xl font-bold text-white mb-2">Posts</h1>
-                    <p className="text-gray-400">Create Posts</p>
-                </div>
-            </div>
 
-            {postsData.length === 0 ? (
-                <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-8">
-                    <p className="text-gray-400 text-center">
-                        No posts yet. Create one below!
-                    </p>
-                </div>
-            ) : (
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {postsData.map((post) => (
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 py-12 px-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-white mb-2">Blog Posts List</h1>
+          <p className="text-gray-400">Blog app built with TanStack Start</p>
+        </div>
+
+        {postsData.length === 0 ? (
+          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-8">
+            <p className="text-gray-400 text-center">
+              No posts yet. Create one below!
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {postsData.map((post) => (
               <div
                 key={post.id}
                 className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6 hover:border-cyan-500/50 transition-all"
@@ -72,8 +73,9 @@ function PostsList() {
                 </div>
               </div>
             ))}
-            </div>
-            )}
-        </div>
-    )
+          </div>
+        )}
+      </div>
+    </div>
+  )
 }

@@ -1,11 +1,18 @@
-import { drizzle } from 'drizzle-orm/node-postgres'
+// src/db/index.ts
+import { drizzle } from 'drizzle-orm/neon-http'
 import { neon } from '@neondatabase/serverless'
 import * as schema from './schema.ts'
-import { prisma } from '../db.ts'
 
-export const db = drizzle(process.env.DATABASE_URL!, { schema })
+export function getDb() {
+  const connectionString = process.env.DATABASE_URL || process.env.VITE_DATABASE_URL
+  
+  if (!connectionString) {
+    throw new Error('DATABASE_URL is not set!')
+  }
 
-export { prisma }
+  const sql = neon(connectionString)
+  return drizzle(sql, { schema })
+}
 
 export async function getClient() {
   const connectionString = process.env.DATABASE_URL || process.env.VITE_DATABASE_URL
