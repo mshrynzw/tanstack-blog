@@ -307,6 +307,222 @@ Once we've created the derived store we can use it in the `App` component just l
 
 You can find out everything you need to know on how to use TanStack Store in the [TanStack Store documentation](https://tanstack.com/store/latest).
 
+# ブログアプリ学習プラン
+
+このプロジェクトを使って、TanStack Startでブログアプリを作成しながら学習できます。以下の推奨学習順序に従って、段階的に機能を実装していきましょう。
+
+## 推奨学習順序
+
+### レッスン1-2: 基本構造とデータベーススキーマ
+**目標**: ファイルベースルーティングとデータベース設計を理解する
+
+1. **ルーティング構造の作成**
+   - `/posts` - 記事一覧ページ
+   - `/posts/$postId` - 記事詳細ページ
+   - `/posts/new` - 新規記事作成ページ
+
+2. **データベーススキーマの設計**
+   - `posts`テーブルの作成（タイトル、本文、著者情報、作成日時、更新日時）
+   - `pnpm db:push`でスキーマを適用
+
+**学習内容:**
+- `createFileRoute`の使い方
+- 動的ルート（`$postId`）
+- Drizzle ORMのスキーマ定義
+
+---
+
+### レッスン3: Server Functions基礎
+**目標**: `createServerFn`でデータ取得を実装
+
+1. **記事一覧を取得するServer Function**
+   - GETメソッドで記事一覧を取得
+   - データベースクエリの実行
+
+**学習内容:**
+- `createServerFn`の基本
+- データベースクエリ
+- 型安全性
+
+**実装例:**
+```typescript
+const getPosts = createServerFn({
+  method: 'GET',
+}).handler(async () => {
+  return await db.query.posts.findMany({
+    orderBy: [desc(posts.createdAt)],
+  })
+})
+```
+
+---
+
+### レッスン4: LoadersとSSR
+**目標**: ルートローダーでデータを事前取得
+
+1. **Loaderで記事データを取得**
+   - `loader`関数の実装
+   - `useLoaderData`でデータ取得
+
+**学習内容:**
+- `loader`の使い方
+- `useLoaderData`フック
+- SSRの動作原理
+
+**実装例:**
+```typescript
+export const Route = createFileRoute('/posts')({
+  loader: async () => await getPosts(),
+  component: PostsList,
+})
+
+function PostsList() {
+  const posts = Route.useLoaderData()
+  // ...
+}
+```
+
+---
+
+### レッスン5: 動的ルートと詳細ページ
+**目標**: 個別記事ページの実装
+
+1. **記事詳細ページの実装**
+   - `/posts/$postId`で記事詳細を表示
+   - 動的ルートパラメータの取得
+
+**学習内容:**
+- 動的ルートパラメータ（`useParams`）
+- 個別データ取得
+- エラーハンドリング（記事が見つからない場合）
+
+---
+
+### レッスン6: フォームとServer Functions（POST）+ Zod導入
+**目標**: 記事作成機能とバリデーション
+
+1. **新規記事作成フォーム**
+   - フォームUIの実装
+   - POST Server Functionの実装
+
+2. **Zodによるバリデーション**
+   - バリデーションスキーマの定義
+   - `inputValidator`での検証
+
+**学習内容:**
+- `inputValidator`でのバリデーション
+- POST Server Function
+- フォーム送信とリダイレクト
+- Zodスキーマの定義
+
+**実装例:**
+```typescript
+import { z } from 'zod'
+
+const createPostSchema = z.object({
+  title: z.string()
+    .min(1, 'タイトルは必須です')
+    .max(200, 'タイトルは200文字以内で入力してください'),
+  content: z.string()
+    .min(1, '本文は必須です')
+    .max(10000, '本文は10000文字以内で入力してください'),
+})
+
+const createPost = createServerFn({
+  method: 'POST',
+})
+  .inputValidator(createPostSchema)
+  .handler(async ({ data }) => {
+    return await db.insert(posts).values(data)
+  })
+```
+
+---
+
+### レッスン7: 認証統合
+**目標**: WorkOSと連携して認証機能を追加
+
+1. **認証保護された機能**
+   - 記事作成を認証ユーザーのみに制限
+   - 著者情報の保存
+
+**学習内容:**
+- `useAuth`フック（WorkOS）
+- 認証状態の確認
+- 保護されたルート
+- ユーザー情報の取得
+
+---
+
+### レッスン8: 編集・削除機能
+**目標**: CRUD操作の完成
+
+1. **記事編集・削除機能**
+   - PUT/DELETE Server Functions
+   - オプティミスティック更新
+
+**学習内容:**
+- PUT/DELETE Server Functions
+- `router.invalidate()`での再取得
+- オプティミスティック更新
+- 権限チェック（自分の記事のみ編集可能）
+
+---
+
+### レッスン9: 検索とフィルタリング
+**目標**: 高度なデータ操作
+
+1. **記事検索機能**
+   - クエリパラメータの扱い
+   - データベース検索
+
+**学習内容:**
+- クエリパラメータ（`useSearch`）
+- データベース検索（LIKE、全文検索）
+- クライアント側フィルタリング
+
+---
+
+### レッスン10: ストリーミングと最適化
+**目標**: パフォーマンス最適化
+
+1. **ストリーミングSSR**
+   - プログレッシブレンダリング
+   - コード分割
+
+**学習内容:**
+- ストリーミングSSR
+- コード分割
+- キャッシング戦略
+- パフォーマンス最適化
+
+---
+
+## 学習の進め方
+
+1. **各レッスンを順番に実装**
+   - レッスン1-2から始めて、順番に進めていきましょう
+   - 各レッスンで1つの機能を学びます
+
+2. **既存のデモコードを参考に**
+   - `src/routes/demo/`フォルダ内のサンプルコードを参考にできます
+   - 特に`drizzle.tsx`、`prisma.tsx`、`start.server-funcs.tsx`が役立ちます
+
+3. **データベース操作**
+   - Drizzle ORMを使用（`src/db/index.ts`）
+   - スキーマ変更後は`pnpm db:push`で適用
+
+4. **Zodの使用**
+   - レッスン6以降でZodを導入してバリデーションを強化
+   - `src/lib/validations.ts`にスキーマを定義することを推奨
+
+## 参考リソース
+
+- [TanStack Start ドキュメント](https://tanstack.com/start)
+- [TanStack Router ドキュメント](https://tanstack.com/router)
+- [Drizzle ORM ドキュメント](https://orm.drizzle.team/)
+- [Zod ドキュメント](https://zod.dev/)
+
 # Demo files
 
 Files prefixed with `demo` can be safely deleted. They are there to provide a starting point for you to play around with the features you've installed.
